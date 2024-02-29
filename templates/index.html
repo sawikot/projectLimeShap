@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Data</title>
+    
+    <!-- Include Bootstrap CSS from CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style type="text/css">
+    .clickable-row:hover {
+        cursor: pointer;
+    }
+
+    .highlight td {
+      background-color: #CFF5FF;
+    }
+
+    .table-hover > tbody > tr:hover > td,
+    .table-hover > tbody > tr:hover > th {
+        background-color: #CFF5FF;
+    }
+
+    .student_info{
+        margin-top: 50px;
+        margin-bottom: 50px;
+    }
+
+    #explanation-container{
+        margin-bottom: 20px;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h5 class="mt-5">DataSet</h5>
+        
+        <!-- Add a scrollable div with a fixed height -->
+        <div class="scrollable-table mt-3">
+            <table class="table table-striped  table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <!-- Loop through CSV headers to generate table headers -->
+                        {% for header in columns_name %}
+                            <th>{{ header }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                        <tr class="clickable-row" data-row-index="{{ loop.index0 }}">
+                            {% for cell in row %}
+                                <td class="nowrap-cell">{{ cell }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="loadingSpinner" style="display: none;">
+            <div class="d-flex justify-content-center mt-5">
+                  <div class="spinner-border text-primary" style="width: 5rem; height: 5rem;" role="status">
+              </div>
+            </div>
+        </div>
+
+        <div id="myDivToHide"  style="display: none;">
+            <div class="card student_info">
+                <div class="card-body">
+                  <h5 class="card-title">Select Row Information</h5>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <ul id="personalInfoList" class="list-group">
+                        <li class="list-group-item"><strong>duration:</strong><span id="duration"></span></li>
+                        <li class="list-group-item"><strong>protocol_type:</strong><span id="protocol_type"></span></li>
+                        <li class="list-group-item"><strong>service:</strong><span id="service"></span></li>
+                        <li class="list-group-item"><strong>flag:</strong><span id="flag"></span></li>
+                        <li class="list-group-item"><strong>src_bytes:</strong><span id="src_bytes"></span></li>
+                        <li class="list-group-item"><strong>dst_bytes:</strong><span id="dst_bytes"></span></li>
+                        <li class="list-group-item"><strong>land:</strong><span id="land"></span></li>
+                        <li class="list-group-item"><strong>wrong_fragment:</strong><span id="wrong_fragment"></span></li>
+                        <li class="list-group-item"><strong>urgent:</strong><span id="urgent"></span></li>
+                        <li class="list-group-item"><strong>hot:</strong><span id="hot"></span></li>
+                        <li class="list-group-item"><strong>num_failed_logins:</strong><span id="num_failed_logins"></span></li>
+                        <li class="list-group-item"><strong>logged_in:</strong><span id="logged_in"></span></li>
+                        <li class="list-group-item"><strong>num_compromised:</strong><span id="num_compromised"></span></li>
+                        <li class="list-group-item"><strong>root_shell:</strong><span id="root_shell"></span></li>
+                      </ul>
+                    </div>
+                    <div class="col-md-4">
+                      <ul class="list-group">
+                        <li class="list-group-item"><strong>su_attempted:</strong><span id="su_attempted"></span></li>
+                        <li class="list-group-item"><strong>num_root:</strong><span id="num_root"></span></li>
+                        <li class="list-group-item"><strong>num_file_creations:</strong><span id="num_file_creations"></span></li>
+                        <li class="list-group-item"><strong>num_shells:</strong><span id="num_shells"></span></li>
+                        <li class="list-group-item"><strong>num_access_files:</strong><span id="num_access_files"></span></li>
+                        <li class="list-group-item"><strong>num_outbound_cmds:</strong><span id="num_outbound_cmds"></span></li>
+                        <li class="list-group-item"><strong>is_host_login:</strong><span id="is_host_login"></span></li>
+                        <li class="list-group-item"><strong>is_guest_login:</strong><span id="is_guest_login"></span></li>
+                        <li class="list-group-item"><strong>count:</strong><span id="count"></span></li>
+                        <li class="list-group-item"><strong>srv_count:</strong><span id="srv_count"></span></li>
+                        <li class="list-group-item"><strong>serror_rate:</strong><span id="serror_rate"></span></li>
+                        <li class="list-group-item"><strong>srv_serror_rate:</strong><span id="srv_serror_rate"></span></li>
+                        <li class="list-group-item"><strong>rerror_rate:</strong><span id="rerror_rate"></span></li>
+                        <li class="list-group-item"><strong>srv_rerror_rate:</strong><span id="srv_rerror_rate"></span></li>
+                      </ul>
+                    </div>
+                    <div class="col-md-4">
+                      <ul class="list-group">
+                        <li class="list-group-item"><strong>same_srv_rate:</strong><span id="same_srv_rate"></span></li>
+                        <li class="list-group-item"><strong>diff_srv_rate:</strong><span id="diff_srv_rate"></span></li>
+                        <li class="list-group-item"><strong>srv_diff_host_rate:</strong><span id="srv_diff_host_rate"></span></li>
+                        <li class="list-group-item"><strong>dst_host_count:</strong><span id="dst_host_count"></span></li>
+                        <li class="list-group-item"><strong>dst_host_srv_count:</strong><span id="dst_host_srv_count"></span></li>
+                        <li class="list-group-item"><strong>dst_host_same_srv_rate:</strong><span id="dst_host_same_srv_rate"></span></li>
+                        <li class="list-group-item"><strong>dst_host_diff_srv_rate:</strong><span id="dst_host_diff_srv_rate"></span></li>
+                        <li class="list-group-item"><strong>dst_host_same_src_port_rate:</strong><span id="dst_host_same_src_port_rate"></span></li>
+                        <li class="list-group-item"><strong>dst_host_srv_diff_host_rate:</strong><span id="dst_host_srv_diff_host_rate"></span></li>
+                        <li class="list-group-item"><strong>dst_host_serror_rate:</strong><span id="dst_host_serror_rate"></span></li>
+                        <li class="list-group-item"><strong>dst_host_srv_serror_rate:</strong><span id="dst_host_srv_serror_rate"></span></li>
+                        <li class="list-group-item"><strong>dst_host_rerror_rate:</strong><span id="dst_host_rerror_rate"></span></li>
+                        <li class="list-group-item"><strong>dst_host_srv_rerror_rate:</strong><span id="dst_host_srv_rerror_rate"></span></li>
+                        
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+            <div class="card student_info">
+                <div class="card-body">
+                    <h5 class="card-title">Predicted class: <span id="class_names"></span></h5>
+                </div>
+            </div>
+
+            <div class="card student_info">
+                <div class="card-body">
+                    <h5 class="card-title">Lime</h5>
+                    <div id="explanation-container"></div>
+                    <p id="response_lime_openai" class="bg-primary text-white p-3 rounded"></p>
+                </div>
+            </div>
+
+            <div class="card student_info">
+                <div class="card-body">
+                    <h5 class="card-title">SHAP</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <img id="shap_image" src="your_image_source.jpg" alt="SHAP Plot" class="img-fluid">
+                        </div>
+                        <div class="col-md-6">
+                            <p id="response_shap_openai" class="bg-primary text-white p-3 rounded"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Include Bootstrap JS from CDN (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+
+            function showLoadingSpinner() {
+                // Show loading spinner while hiding the specific div
+                document.getElementById('loadingSpinner').style.display = 'inline';
+                document.getElementById('myDivToHide').style.display = 'none';
+            }
+
+            function hideLoadingSpinner() {
+                // Hide loading spinner and make the specific div visible
+                document.getElementById('loadingSpinner').style.display = 'none';
+                document.getElementById('myDivToHide').style.display = 'inline'; // or 'inline', 'flex', etc.
+            }
+
+            // Define the update function
+            function updateData(rowIndex) {
+                fetch('/update_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'selected_row_index=' + rowIndex, // Adjust the body content as needed
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    hideLoadingSpinner();
+
+
+                    $('#explanation-container').html(data.explanation_html);
+                    $('#response_lime_openai').html(data.response_lime_openai);
+                    $('#response_shap_openai').html(data.response_shap_openai);
+
+                    $(document).ready(function() {
+                        $("#shap_image").attr("src", data.shap_img);
+                      });
+
+
+                    document.getElementById("class_names").textContent = data.class_names;
+
+                    
+                    // Update the data on the page without refreshing
+                    document.getElementById("duration").textContent = data.selected_row_data.duration;
+                    document.getElementById("protocol_type").textContent = data.selected_row_data.protocol_type;
+                    document.getElementById("service").textContent = data.selected_row_data.service;
+                    document.getElementById("flag").textContent = data.selected_row_data.flag;
+                    document.getElementById("src_bytes").textContent = data.selected_row_data.src_bytes;
+                    document.getElementById("dst_bytes").textContent = data.selected_row_data.dst_bytes;
+                    document.getElementById("land").textContent = data.selected_row_data.land;
+                    document.getElementById("wrong_fragment").textContent = data.selected_row_data.wrong_fragment;
+                    document.getElementById("urgent").textContent = data.selected_row_data.urgent;
+                    document.getElementById("hot").textContent = data.selected_row_data.hot;
+                    document.getElementById("num_failed_logins").textContent = data.selected_row_data.num_failed_logins;
+                    document.getElementById("logged_in").textContent = data.selected_row_data.logged_in;
+                    document.getElementById("num_compromised").textContent = data.selected_row_data.num_compromised;
+                    document.getElementById("root_shell").textContent = data.selected_row_data.root_shell;
+                    document.getElementById("su_attempted").textContent = data.selected_row_data.su_attempted;
+                    document.getElementById("num_root").textContent = data.selected_row_data.num_root;
+                    document.getElementById("num_file_creations").textContent = data.selected_row_data.num_file_creations;
+                    document.getElementById("num_shells").textContent = data.selected_row_data.num_shells;
+                    document.getElementById("num_access_files").textContent = data.selected_row_data.num_access_files;
+                    document.getElementById("num_outbound_cmds").textContent = data.selected_row_data.num_outbound_cmds;
+                    document.getElementById("is_host_login").textContent = data.selected_row_data.is_host_login;
+                    document.getElementById("is_guest_login").textContent = data.selected_row_data.is_guest_login;
+                    document.getElementById("count").textContent = data.selected_row_data.count;
+                    document.getElementById("srv_count").textContent = data.selected_row_data.srv_count;
+                    document.getElementById("serror_rate").textContent = data.selected_row_data.serror_rate;
+                    document.getElementById("srv_serror_rate").textContent = data.selected_row_data.srv_serror_rate;
+                    document.getElementById("rerror_rate").textContent = data.selected_row_data.rerror_rate;
+                    document.getElementById("srv_rerror_rate").textContent = data.selected_row_data.srv_rerror_rate;
+                    document.getElementById("same_srv_rate").textContent = data.selected_row_data.same_srv_rate;
+                    document.getElementById("diff_srv_rate").textContent = data.selected_row_data.diff_srv_rate;
+                    document.getElementById("srv_diff_host_rate").textContent = data.selected_row_data.srv_diff_host_rate;
+                    document.getElementById("dst_host_count").textContent = data.selected_row_data.dst_host_count;
+                    document.getElementById("dst_host_srv_count").textContent = data.selected_row_data.dst_host_srv_count;
+                    document.getElementById("dst_host_same_srv_rate").textContent = data.selected_row_data.dst_host_same_srv_rate;
+                    document.getElementById("dst_host_diff_srv_rate").textContent = data.selected_row_data.dst_host_diff_srv_rate;
+                    document.getElementById("dst_host_same_src_port_rate").textContent = data.selected_row_data.dst_host_same_src_port_rate;
+                    document.getElementById("dst_host_srv_diff_host_rate").textContent = data.selected_row_data.dst_host_srv_diff_host_rate;
+                    document.getElementById("dst_host_serror_rate").textContent = data.selected_row_data.dst_host_serror_rate;
+                    document.getElementById("dst_host_srv_serror_rate").textContent = data.selected_row_data.dst_host_srv_serror_rate;
+                    document.getElementById("dst_host_rerror_rate").textContent = data.selected_row_data.dst_host_rerror_rate;
+                    document.getElementById("dst_host_srv_rerror_rate").textContent = data.selected_row_data.dst_host_srv_rerror_rate;
+
+
+                })
+                .catch(error => {
+                    console.error('Error updating data:', error);
+                    hideLoadingSpinner();
+                });
+            }
+
+            var rows = document.querySelectorAll('.clickable-row');
+
+            rows.forEach(function (row) {
+                row.addEventListener('click', function () {
+                    // Remove 'highlight' class from all siblings
+                    var siblings = Array.from(row.parentNode.children);
+                    siblings.forEach(function (sibling) {
+                        if (sibling !== row) {
+                            sibling.classList.remove('highlight');
+                        }
+                    });
+
+                    // Add 'highlight' class to the clicked row
+                    row.classList.add('highlight');
+
+                    showLoadingSpinner();
+
+                    var rowIndex = row.getAttribute('data-row-index');
+
+                    updateData(rowIndex);
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>

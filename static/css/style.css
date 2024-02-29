@@ -1,0 +1,21 @@
+/* Add custom CSS to freeze the table header */
+.scrollable-table {
+    max-height: 400px; /* Adjust the height as needed */
+    overflow-y: auto; /* Enable vertical scrolling when the content exceeds the div height */
+}
+
+.scrollable-table table {
+    width: 100%;
+}
+
+.scrollable-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: white;
+}
+
+.nowrap-cell {
+    white-space: nowrap; /* Prevent text from wrapping */
+    /* Optionally, set a specific width to avoid expansion */
+    /* width: 100px; */
+}
